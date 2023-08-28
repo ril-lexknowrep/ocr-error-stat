@@ -1,10 +1,7 @@
 import json
 import zipfile
-import numpy as np
-import xycut
-import reading_order
+from sys import argv
 
-PAGE_DIGITS = 4
 
 def restructure_json(json_data):
     parsed_json = json.loads(json_data)
@@ -22,7 +19,7 @@ def restructure_json(json_data):
             spans = line['spans']
             origin = (spans[0]['x'],                   # x
                       page_height - spans[0]['line'])  # y
-            right_edge = origin[0] + sum(spans[-1]['w'])
+            right_edge = spans[-1]['x'] + sum(spans[-1]['w'])
             max_asc, max_desc = spans[0]['asc'], spans[0]['desc']
             line_text = ''.join(spans[0]['s'])
             for span in spans[1:]:
@@ -63,4 +60,4 @@ def process_cbz(cbz_path, output_path):
 
         json.dump(output_data, json_out)
 
-process_cbz('2000Folyoirat_2000folyoirat_1989_04.cbz', "output.json")
+process_cbz(argv[1], argv[2])
