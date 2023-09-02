@@ -64,12 +64,14 @@ def same_row(line_a, line_b):
 
 def align_1_2(unpaired_this, unpaired_other,
               this_list, other_list,
+              this_no_space, other_no_space,
               this_name, other_name):
     '''
     Check unpaired lines for possible 1:2 alignments
     '''
 
     concats = []
+    concat_texts = []
     new_pairs = []
     unpaired_this_sorted = sorted(unpaired_this,
                                     key=lambda x: this_list[x]['bbox'][0])
@@ -79,6 +81,7 @@ def align_1_2(unpaired_this, unpaired_other,
                         this_list[unpaired_this_sorted[j]]):
                 concats.append((unpaired_this_sorted[i],
                                 unpaired_this_sorted[j]))
+                concat_texts.append(this_no_space[i] + this_no_space[j])
 
     if concats and unpaired_other:
         print("Concats")
@@ -92,6 +95,8 @@ def align_1_2(unpaired_this, unpaired_other,
                 for conc in concats])
         other_centers = np.array([other_list[line_nr]['center']
                                   for line_nr in unpaired_other])
+        other_texts = [other_no_space[line_nr]
+                       for line_nr in unpaired_other]
 
         unp_distance_matrix = cdist(concat_centers, other_centers)
         unp_idx_matrix = np.zeros([len(concat_centers), len(other_centers)],
@@ -100,8 +105,8 @@ def align_1_2(unpaired_this, unpaired_other,
             for j in range(len(other_centers)):
                 unp_idx_matrix[i, j] = IDX_MULT * i + j
 
-        for i, a in enumerate(concat_centers):
-            for j, b in enumerate(other_centers):
+        for i, a in enumerate(concat_texts):
+            for j, b in enumerate(other_texts):
                 if unp_distance_matrix[i, j] < MAXDIST:
                     unp_distance_matrix[i, j] += distance(a, b)
                 else:
@@ -213,7 +218,7 @@ def main():
         unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
 
         new_pairs = align_1_2(unpaired_a, unpaired_b, a_list, b_list,
-                              'A', 'B')
+                              a_no_space, b_no_space, 'A', 'B')
 
         for a, b in new_pairs:
             pairs_dict[a] = b
@@ -221,7 +226,7 @@ def main():
         unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
 
         new_pairs = align_1_2(unpaired_b, unpaired_a, b_list, a_list,
-                              'B', 'A')
+                              b_no_space, a_no_space, 'B', 'A')
         for b, a in new_pairs:
             pairs_dict[a] = b
 

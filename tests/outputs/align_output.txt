@@ -12010,14 +12010,14 @@ Skipping footer B: 32 HIRDETÉS
 32 35 4.440849610468239
 Concats
 [(16, 20), (15, 19), (14, 18)]
+B1 15 12 hónapra 10 000 Ft után 1500 Ft 
+B2 19 4- 100 Ft kamatprémium
+A 15 6 hónapra 10 000 Ft után 700 Ft + 50 Ft kamatprémium 
 B1 16 24 hónapra 10 000 Ft után 3300 Ft
 B2 20 4- 200 Ft kamatprémium
 A 17 24 hónapra 10 000 Ft után 3300 Ft + 200 Ft kamatprémium 
 B1 14 6 hónapra 10 000 Ft után 700 Ft 
 B2 18 4- 50 Ft kamatprémium
-A 15 6 hónapra 10 000 Ft után 700 Ft + 50 Ft kamatprémium 
-B1 15 12 hónapra 10 000 Ft után 1500 Ft 
-B2 19 4- 100 Ft kamatprémium
 A 16 12 hónapra 10 000 Ft után 1500 Ft + 100 Ft kamatprémium 
 
 0 ÚJDONSÁG
@@ -12082,11 +12082,11 @@ A 16 12 hónapra 10 000 Ft után 1500 Ft + 100 Ft kamatprémium
 
 15 6 hónapra 10 000 Ft után 700 Ft + 50 Ft kamatprémium
 !!!
-14 6 hónapra 10 000 Ft után 700 Ft 4- 50 Ft kamatprémium
+15 12 hónapra 10 000 Ft után 1500 Ft 4- 100 Ft kamatprémium
 
 16 12 hónapra 10 000 Ft után 1500 Ft + 100 Ft kamatprémium
 !!!
-15 12 hónapra 10 000 Ft után 1500 Ft 4- 100 Ft kamatprémium
+14 6 hónapra 10 000 Ft után 700 Ft 4- 50 Ft kamatprémium
 
 17 24 hónapra 10 000 Ft után 3300 Ft + 200 Ft kamatprémium
 !!!
@@ -15866,4 +15866,4 @@ Skipping footer B: 48 RAKOVSZKY ZSUZSA
 =
 16
 
-Time 0.4219932556152344
+Time 0.41300129890441895
