@@ -8,10 +8,44 @@ from Levenshtein import distance
 
 MAXDIST = 30
 IDX_MULT = 1000
+HEADER_HEIGHT = 0.1
+FOOTER_HEIGHT = 0.1
 
-def list_lines(data):
-    line_list = []
+
+def list_lines(data, skip_header=True, doc=''):
+    if skip_header:
+        page_height = data['cropbox'][3] - data['cropbox'][1]
+        header_bottom = page_height * HEADER_HEIGHT + data['cropbox'][1]
+        footer_top = page_height * (1 - FOOTER_HEIGHT) + data['cropbox'][1]
+        line_list = []
+        top_block_height = page_height
+        bottom_block_height = 0
+        for block in data["blocks"]:
+            if (len(block['lines']) == 1
+                    and block['bbox'][3] < header_bottom
+                    and block['bbox'][3] < top_block_height):
+                top_block_height = block['bbox'][3]
+            elif (len(block['lines']) == 1
+                    and block['bbox'][1] > footer_top
+                    and block['bbox'][1] > bottom_block_height):
+                bottom_block_height = block['bbox'][1]
+        if top_block_height == page_height:
+            top_block_height = 0
+        if bottom_block_height == 0:
+            bottom_block_height = page_height
+
     for block in data["blocks"]:
+        if (skip_header
+                and len(block['lines']) == 1
+                and block['bbox'][1] < top_block_height):
+            print(f"Skipping header {doc}: {block['lines'][0]['text']}")
+            continue
+        elif (skip_header
+                and len(block['lines']) == 1
+                and block['bbox'][3] > bottom_block_height):
+            print(f"Skipping footer {doc}: {block['lines'][0]['text']}")
+            continue
+
         for line in block["lines"]:
             line_list.append(line)
     return line_list
@@ -26,8 +60,8 @@ def main():
 
     for p_num in range(min(len(doc_a['pages']), len(doc_b['pages']))):
         print("Page", p_num)
-        a_list = list_lines(doc_a['pages'][p_num])
-        b_list = list_lines(doc_b['pages'][p_num])
+        a_list = list_lines(doc_a['pages'][p_num], doc='A')
+        b_list = list_lines(doc_b['pages'][p_num], doc='B')
 
         a_no_space = [a['text'].replace(' ', '')
                       for a in a_list]
