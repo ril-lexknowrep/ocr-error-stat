@@ -51,6 +51,111 @@ def list_lines(data, skip_header=True, doc=''):
     return line_list
 
 
+def same_row(line_a, line_b):
+    # base line of line_a is within the vertical span of line_b,
+    # and vice versa
+    # return (line_a['bbox'][1] < line_b['bbox'][3]
+    #         and line_a['bbox'][3] > line_b['bbox'][1])
+    return (line_a['origin'][1] > line_b['bbox'][1]
+            and line_a['origin'][1] < line_b['bbox'][3]
+            and line_b['origin'][1] > line_a['bbox'][1]
+            and line_b['origin'][1] < line_a['bbox'][3])
+
+
+def align_1_2(unpaired_this, unpaired_other,
+              this_list, other_list,
+              this_name, other_name):
+    '''
+    Check unpaired lines for possible 1:2 alignments
+    '''
+
+    concats = []
+    new_pairs = []
+    unpaired_this_sorted = sorted(unpaired_this,
+                                    key=lambda x: this_list[x]['bbox'][0])
+    for i in range(len(unpaired_this) - 1):
+        for j in range(i + 1, len(unpaired_this)):
+            if same_row(this_list[unpaired_this_sorted[i]],
+                        this_list[unpaired_this_sorted[j]]):
+                concats.append((unpaired_this_sorted[i],
+                                unpaired_this_sorted[j]))
+
+    if concats and unpaired_other:
+        print("Concats")
+        print(concats)
+        # create an array containing the centers of the concatenated lines
+        concat_centers = np.array(
+            [((this_list[conc[0]]['center'][0]
+               + this_list[conc[1]]['center'][0]) / 2,
+              (this_list[conc[0]]['center'][1]
+               + this_list[conc[1]]['center'][1]) / 2)
+                for conc in concats])
+        other_centers = np.array([other_list[line_nr]['center']
+                                  for line_nr in unpaired_other])
+
+        unp_distance_matrix = cdist(concat_centers, other_centers)
+        unp_idx_matrix = np.zeros([len(concat_centers), len(other_centers)],
+                                    dtype=int)
+        for i in range(len(concat_centers)):
+            for j in range(len(other_centers)):
+                unp_idx_matrix[i, j] = IDX_MULT * i + j
+
+        for i, a in enumerate(concat_centers):
+            for j, b in enumerate(other_centers):
+                if unp_distance_matrix[i, j] < MAXDIST:
+                    unp_distance_matrix[i, j] += distance(a, b)
+                else:
+                    unp_distance_matrix[i, j] = np.inf
+
+        while unp_distance_matrix.shape[0] > 0 and unp_distance_matrix.shape[1] > 0:
+            min_i, min_j = np.unravel_index(np.argmin(unp_distance_matrix),
+                                            unp_distance_matrix.shape)
+            if unp_distance_matrix[min_i, min_j] == np.inf:
+                break
+            else:
+                concat_idx = unp_idx_matrix[min_i, min_j] // IDX_MULT
+                unpaired_other_idx = unp_idx_matrix[min_i, min_j] % IDX_MULT
+                concat_1 = this_list[concats[concat_idx][0]]
+                concat_2 = this_list[concats[concat_idx][1]]
+                print(f'{this_name}1', concats[concat_idx][0], concat_1['text'])
+                print(f'{this_name}2', concats[concat_idx][1], concat_2['text'])
+                print(other_name, unpaired_other[unpaired_other_idx],
+                      other_list[unpaired_other[unpaired_other_idx]]['text'])
+
+                # Change text and coordinates of the left half of the
+                # concatenated line and remove text from the right half
+                concat_1['bbox'] = [
+                    concat_1['bbox'][0],
+                    min(concat_1['bbox'][1], concat_2['bbox'][1]),
+                    concat_2['bbox'][2],
+                    max(concat_1['bbox'][3], concat_2['bbox'][3])]
+                concat_1['text'] += concat_2['text']
+                concat_1['center'] = [
+                    (concat_1['bbox'][0] + concat_1['bbox'][2]) / 2,
+                    (concat_1['bbox'][1] + concat_1['bbox'][3]) / 2]
+                
+                concat_2['text'] = ' '
+
+                new_pairs.append((concats[concat_idx][0],
+                                  unpaired_other[unpaired_other_idx]))
+
+                unp_distance_matrix = np.delete(
+                    np.delete(unp_distance_matrix, min_i, axis=0), min_j, axis=1)
+                unp_idx_matrix = np.delete(
+                    np.delete(unp_idx_matrix, min_i, axis=0), min_j, axis=1)
+
+    return new_pairs
+
+
+def find_unpaired(a_list, b_list, pairs_dict):
+    paired_bs = set(pairs_dict.values())
+    unpaired_a = [i for i in range(len(a_list))
+                  if i not in pairs_dict]
+    unpaired_b = [i for i in range(len(b_list))
+                  if i not in paired_bs]
+    return unpaired_a, unpaired_b
+
+
 def main():
     start_t = time.time()
     with (open(argv[1]) as a_file,
@@ -81,7 +186,6 @@ def main():
             for j in range(len(b_centers)):
                 idx_matrix[i, j] = IDX_MULT * i + j
         pairs_dict = {}
-        pairs_list = []
 
         for i, a in enumerate(a_no_space):
             for j, b in enumerate(b_no_space):
@@ -106,15 +210,34 @@ def main():
                 idx_matrix = np.delete(
                     np.delete(idx_matrix, min_i, axis=0), min_j, axis=1)
 
+        unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
+
+        new_pairs = align_1_2(unpaired_a, unpaired_b, a_list, b_list,
+                              'A', 'B')
+
+        for a, b in new_pairs:
+            pairs_dict[a] = b
+
+        unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
+
+        new_pairs = align_1_2(unpaired_b, unpaired_a, b_list, a_list,
+                              'B', 'A')
+        for b, a in new_pairs:
+            pairs_dict[a] = b
+
+        pairs_list = []
+        for a, b in pairs_dict.items():
+            pairs_list.append((a, b))
+
+        unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
+
+        for a in unpaired_a:
+            pairs_list.append((a, None))
+        for b in unpaired_b:
+            pairs_list.append((None, b))
+
+        pairs_list = sorted(pairs_list, key=lambda x: (x[0] or 0) or (x[1] or 0))
         print()
-
-        for line_a in range(len(a_list)):
-            pairs_list.append((line_a, pairs_dict.get(line_a)))
-
-        paired_bs = set(pairs_dict.values())
-        for line_b in range(len(b_list)):
-            if line_b not in paired_bs:
-                pairs_list.append((None, line_b))
 
         for line_a, line_b in pairs_list:
             try:

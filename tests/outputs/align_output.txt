@@ -1369,13 +1369,17 @@ Skipping footer B: 4 LENGYEL LÁSZLÓ
 27 28 2.6293172318445444
 8 9 2.759198385173454
 
-0 tott társadalom, az alkukban sértett érdekcsoportok rögtön
-=
-1
+None None
+!!!
+0 —  ... . 2000 =======
 
 1 bosszút álltak. Lengyelországon és Jugoszlávián tavasszal
 =
 2
+
+0 tott társadalom, az alkukban sértett érdekcsoportok rögtön
+=
+1
 
 2 gazdasági indíttatású sztrájkok söpörtek végig, amelyek-
 =
@@ -1832,10 +1836,6 @@ Skipping footer B: 4 LENGYEL LÁSZLÓ
 115 ségi, a „fideszes" diák. Jól látható, hogy az osztályharcos
 !!!
 116 ségi, a „fideszes” diák. Jól látható, hogy az osztályharcos
-
-None None
-!!!
-0 —  ... . 2000 =======
 
 Page 6
 Skipping header A: ===== 2000 
@@ -3334,6 +3334,10 @@ Skipping footer B: 8 LESZEK KOLAKOWSKI
 70 71 3.5919219603948607
 19 20 5.770026840066485
 
+None None
+!!!
+0 _  2000 —
+
 0 szovjet filozófia nem hagyott hátra semmi említésre méltót,
 =
 1
@@ -3794,10 +3798,6 @@ Skipping footer B: 8 LESZEK KOLAKOWSKI
 =
 115
 
-None None
-!!!
-0 _  2000 —
-
 Page 10
 Skipping header A: === 2000 
 Skipping footer A: » 
@@ -3902,18 +3902,31 @@ Skipping footer B: 9 A KOMMUNIZMUS MINT KULTURÁLIS JELENSÉG
 33 34 3.6893737794797055
 0 2 3.7743346298300624
 88 89 4.599044140643744
+Concats
+[(6, 7)]
+A1 6 1 
+A2 7 J 
+B 8 ________________________ .______________________________________  J
 
-0 ,yA szép román ajándékok között megható volt egy könyv. Vakírásos könyv: A Párttörté-
+None None
 !!!
-2 ,3 szép román ajándékok között megható volt egy könyv. Vakírásos könyv: A Párttörté-
+0 2000 = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 1 net. Vak emberek küldték ezt a könyvet Romániából és azt írták rá az ő betűikkel: »Amikor
 =
 3
 
+None None
+!!!
+1 --- ---------------------------------------------------------------------
+
 2 elolvastuk ezt a könyvet, megláttuk a világosságot.«"
 !!!
 4 elolvastuk ezt a könyvet, megláttuk a világosságot.«”
+
+0 ,yA szép román ajándékok között megható volt egy könyv. Vakírásos könyv: A Párttörté-
+!!!
+2 ,3 szép román ajándékok között megható volt egy könyv. Vakírásos könyv: A Párttörté-
 
 3 Sipos Gyula: A Sztálini ajándékkiállításon, in: Ukrajna kolhozaiban, A Földmű-
 !!!
@@ -3927,11 +3940,11 @@ Skipping footer B: 9 A KOMMUNIZMUS MINT KULTURÁLIS JELENSÉG
 =
 7
 
-6 1
+6 1 J
 !!!
-None None
+8 ________________________ .______________________________________  J
 
-7 J
+7 
 !!!
 None None
 
@@ -4314,18 +4327,6 @@ None None
 102 9 A KOMMUNIZMUS MINT KULTURÁLIS JELENSÉG
 !!!
 None None
-
-None None
-!!!
-0 2000 = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-None None
-!!!
-1 --- ---------------------------------------------------------------------
-
-None None
-!!!
-8 ________________________ .______________________________________  J
 
 Page 11
 Skipping header A: 2000 
@@ -6682,13 +6683,17 @@ Skipping footer B: 14 PETŐ IVÁN
 0 1 3.386522642585444
 27 28 4.220021810641102
 
-0 lően tudnak dolgozni..."
+None None
 !!!
-1 löen tudnak dolgozni...”
+0 ■ 2000 =
 
 1 Rákosi politikai és gazdasági helyzetről s a párt feladata-
 =
 2
+
+0 lően tudnak dolgozni..."
+!!!
+1 löen tudnak dolgozni...”
 
 2 iról elmondott, eddig nem publikált beszéde, benne a
 =
@@ -7145,10 +7150,6 @@ Skipping footer B: 14 PETŐ IVÁN
 115 nyainkat ne mocskoljuk be" szólamok jegyében vállalt
 !!!
 116 nyainkat ne mocskoljuk be” szólamok jegyében vállalt
-
-None None
-!!!
-0 ■ 2000 =
 
 Page 16
 Skipping header A: 2000 
@@ -9379,13 +9380,17 @@ Skipping footer B: 20 NÁDAS PÉTER
 4 5 5.250100166729463
 0 1 6.446159557695386
 
-0 fiút? Válaszom mindenesetre elment, expressz, légiposta. És válaszom nyomán az a bizonyos ő, akit én magya-
-=
-1
+None None
+!!!
+0 2000
 
 1 rul nem nélkül gondolok, a lengyel nyelv szabályai szerint férfivá fog fogalmazódni.
 =
 2
+
+0 fiút? Válaszom mindenesetre elment, expressz, légiposta. És válaszom nyomán az a bizonyos ő, akit én magya-
+=
+1
 
 2 K. pontosan hatkor érkezik. Járásáról messzibbről fölismerem, miként azt rövidlátó szemem megengedné.
 =
@@ -9614,10 +9619,6 @@ Skipping footer B: 20 NÁDAS PÉTER
 58 alatt keresztezi a Konkoly Thege utat
 =
 26
-
-None None
-!!!
-0 2000
 
 Page 22
 Skipping header A: 2000 
@@ -10122,13 +10123,17 @@ Skipping footer B: 23 HELYSZÍNELÉS
 45 46 2.8868606897079516
 44 45 5.078502676124248
 
-0 ben vagyunk."
+None None
 !!!
-1 ben vagyunk.”
+0 : 2000 . -  ---------
 
 1 Elhalt a vonatfütty, meredten álltunk, fény és levegő áradt be a szobába.
 =
 2
+
+0 ben vagyunk."
+!!!
+1 ben vagyunk.”
 
 2 Aztán másnap, hogy ellenőrizzem magam, az Andrássy út hatvan előtt ültem be egy taxiba. Amikor a taxiso-
 =
@@ -10346,10 +10351,6 @@ Skipping footer B: 23 HELYSZÍNELÉS
 =
 56
 
-None None
-!!!
-0 : 2000 . -  ---------
-
 Page 25
 Skipping header A: ==: 2000 
 Skipping footer A: 24 NÁDAS PÉTER 
@@ -10413,9 +10414,9 @@ Skipping footer B: 24 NÁDAS PÉTER
 38 39 3.074310715753417
 6 5 3.4254994474313936
 
-0 Bejárati ajtó, feljárati ajtó a pincéből, és a falép-
-=
-24
+None None
+!!!
+0 __  . . _ 2000 .....
 
 1 cső a földszintről nézve
 =
@@ -10508,6 +10509,10 @@ Skipping footer B: 24 NÁDAS PÉTER
 23 akartam vörös csíkokat hordani a nadrágomon, kedves Péter
 =
 22
+
+0 Bejárati ajtó, feljárati ajtó a pincéből, és a falép-
+=
+24
 
 24 elvtárs.
 =
@@ -10645,10 +10650,6 @@ Skipping footer B: 24 NÁDAS PÉTER
 =
 58
 
-None None
-!!!
-0 __  . . _ 2000 .....
-
 Page 26
 Skipping header A: 2000 
 Skipping footer A: 25 HELYSZÍNELÉS 
@@ -10714,10 +10715,6 @@ Skipping footer B: 25 HELYSZÍNELÉS
 4 10 2.7787475590598043
 26 32 3.199838769214389
 
-0 süket. Ezalatt az ötödik kioldalgott, majd, mire társai ismét
-=
-6
-
 1 sort kerítettek arra, hogy belehengergessenek a szőnyegbe, az
 =
 7
@@ -10737,6 +10734,10 @@ Skipping footer B: 25 HELYSZÍNELÉS
 5 A szöveg hangsúlyos különbséget tesz a földszinti és az
 =
 11
+
+0 süket. Ezalatt az ötödik kioldalgott, majd, mire társai ismét
+=
+6
 
 6 emeleti terem között. Az emeleti terembe, amely már egy má-
 =
@@ -11017,13 +11018,17 @@ Skipping footer B: 26 NÁDAS PÉTER
 50 51 4.039018309943314
 25 26 4.447396195306356
 
-0 „Amikor a T-alakú asztal talpánál hajdani egyetemi kollégámat bámultam, nem jutott eszembe groteszk
-=
-1
+None None
+!!!
+0 ...__ 2000 ■ ■ ■ ~ -------- ..
 
 1 helyzetünk, se az, hogy milyen jövő les ránk. Minden figyelmemet a három vízszintes ránc kötötte le. Az a
 =
 2
+
+0 „Amikor a T-alakú asztal talpánál hajdani egyetemi kollégámat bámultam, nem jutott eszembe groteszk
+=
+1
 
 2 kényszerképzetem támadt, hogy Rajk arca a barázdák vonalán menten szétesik. Ekkor Péter Gábor a nevemet
 =
@@ -11264,10 +11269,6 @@ Skipping footer B: 26 NÁDAS PÉTER
 61 ból a Normafára lehet látni
 =
 62
-
-None None
-!!!
-0 ...__ 2000 ■ ■ ■ ~ -------- ..
 
 Page 28
 Skipping header A: 2000 
@@ -12007,6 +12008,17 @@ Skipping footer B: 32 HIRDETÉS
 1 1 3.360044545706931
 14 17 3.7235695117537695
 32 35 4.440849610468239
+Concats
+[(16, 20), (15, 19), (14, 18)]
+B1 16 24 hónapra 10 000 Ft után 3300 Ft
+B2 20 4- 200 Ft kamatprémium
+A 17 24 hónapra 10 000 Ft után 3300 Ft + 200 Ft kamatprémium 
+B1 14 6 hónapra 10 000 Ft után 700 Ft 
+B2 18 4- 50 Ft kamatprémium
+A 15 6 hónapra 10 000 Ft után 700 Ft + 50 Ft kamatprémium 
+B1 15 12 hónapra 10 000 Ft után 1500 Ft 
+B2 19 4- 100 Ft kamatprémium
+A 16 12 hónapra 10 000 Ft után 1500 Ft + 100 Ft kamatprémium 
 
 0 ÚJDONSÁG
 =
@@ -12070,27 +12082,39 @@ Skipping footer B: 32 HIRDETÉS
 
 15 6 hónapra 10 000 Ft után 700 Ft + 50 Ft kamatprémium
 !!!
-None None
+14 6 hónapra 10 000 Ft után 700 Ft 4- 50 Ft kamatprémium
 
 16 12 hónapra 10 000 Ft után 1500 Ft + 100 Ft kamatprémium
 !!!
-None None
+15 12 hónapra 10 000 Ft után 1500 Ft 4- 100 Ft kamatprémium
 
 17 24 hónapra 10 000 Ft után 3300 Ft + 200 Ft kamatprémium
 !!!
-None None
+16 24 hónapra 10 000 Ft után 3300 Ft4- 200 Ft kamatprémium
 
 18 Ez az összeg adómentesen kerül kifizetésre a lejárat napján.
 =
 21
 
+None None
+!!!
+18 
+
 19 Amennyikben a lejárat előtt fel kívánja bontani a szerződését, az alábbi hozadék illeti meg:
 =
 22
 
+None None
+!!!
+19 
+
 20 3 hónap után 10 000 Ft-ra 220 Ft
 =
 23
+
+None None
+!!!
+20 
 
 21 15 hónap után 10 000 Ft-ra 1720 Ft
 =
@@ -12140,30 +12164,6 @@ None None
 !!!
 35 BUDAPEST BANK Rí
 
-None None
-!!!
-14 6 hónapra 10 000 Ft után 700 Ft
-
-None None
-!!!
-15 12 hónapra 10 000 Ft után 1500 Ft
-
-None None
-!!!
-16 24 hónapra 10 000 Ft után 3300 Ft
-
-None None
-!!!
-18 4- 50 Ft kamatprémium
-
-None None
-!!!
-19 4- 100 Ft kamatprémium
-
-None None
-!!!
-20 4- 200 Ft kamatprémium
-
 Page 34
 Skipping footer A: 33 HIRDETÉS , 
 Skipping footer B: 33 HIRDETÉS
@@ -12177,6 +12177,11 @@ Skipping footer B: 33 HIRDETÉS
 6 6 3.7973705721697235
 7 7 4.091368040623272
 0 0 6.13056955486569
+Concats
+[(9, 10)]
+A1 9 megtalálhatja. 
+A2 10 Keresse fel 
+B 10 megtalálhatja. Keresse fel
 
 0 Az OFOTÉRT
 =
@@ -12214,21 +12219,17 @@ Skipping footer B: 33 HIRDETÉS
 =
 9
 
-9 megtalálhatja.
-!!!
-None None
+9 megtalálhatja. Keresse fel
+=
+10
 
-10 Keresse fel
+10 
 !!!
 None None
 
 11 boltjainkat!
 =
 8
-
-None None
-!!!
-10 megtalálhatja. Keresse fel
 
 Page 35
 Skipping footer A: 34 HIRDETÉS , 
@@ -12804,10 +12805,6 @@ Skipping footer B: 36 HIRDETÉS
 2 6 3.409854777314731
 15 3 5.073934537113655
 
-0 SZÁMÍTÁSTECHNIKAI KISSZÖVETKEZET
-=
-4
-
 1 AJÁNLATAINKBÓL:
 =
 5
@@ -12823,6 +12820,10 @@ Skipping footer B: 36 HIRDETÉS
 4 Német-magyar szótanulás, teszt, nyomtatás.
 =
 8
+
+0 SZÁMÍTÁSTECHNIKAI KISSZÖVETKEZET
+=
+4
 
 5 7000 szó + a propaganda
 =
@@ -13260,6 +13261,10 @@ Skipping footer B: 38 HIRDETÉS
 5 6 7.056818282739474
 24 22 14.771099073435325
 
+None None
+!!!
+0 A GOP A
+
 0 a demokrácia jelképe,
 !!!
 1 a d e m o k r á c ia  je lk é p e ,
@@ -13359,10 +13364,6 @@ None None
 24 LQme/ije meg eßveinket, munkánkat i
 !!!
 22 ísme/tje meg eíuecnbeé, m unfeánbaí!
-
-None None
-!!!
-0 A GOP A
 
 Page 40
 Skipping footer A: 39 EGY KÖZÖNSÉGES HÉTKÖZNAP 
@@ -13645,17 +13646,25 @@ Skipping footer B: 40 BOHUMIL HRABAL
 40 42 2.356162533228795
 17 19 4.901905138014152
 
-0 És újra kinyílt az ajtó és a páciensek újra konstatálták, hogy a váró dugig van, és a nővérke kitessékelte
-=
-2
+None None
+!!!
+0 1
 
 1 az ajtón az akadékoskodó cigányt, és az orvos felháborodott hangja újra és megint kiparancsolta a világos
 =
 3
 
+None None
+!!!
+1 2000 ■■ ■ ■ — ........
+
 2 helyiségből és a cigány óbégatott: - Krisztus urunk szent sebére! A cigány dolgozó ember, elsőbbsége van.
 !!!
 4 helyiségből és a cigány óbégatott: -  Krisztus urunk szent sebére! A cigány dolgozó ember, elsőbbsége van.
+
+0 És újra kinyílt az ajtó és a páciensek újra konstatálták, hogy a váró dugig van, és a nővérke kitessékelte
+=
+2
 
 3 Fáj a torka, a torkocskája fáj.
 =
@@ -13857,14 +13866,6 @@ Skipping footer B: 40 BOHUMIL HRABAL
 =
 54
 
-None None
-!!!
-0 1
-
-None None
-!!!
-1 2000 ■■ ■ ■ — ........
-
 Page 42
 Skipping header A: ===== 2000 
 Skipping header A: _ 
@@ -13924,13 +13925,17 @@ Skipping footer B: 41 EGY KÖZÖNSÉGES HÉTKÖZNAP
 8 9 5.247247434118291
 39 40 5.622243993024185
 
-0 császáré legyen. És az életem? Azzal mi lesz? Többször már nem adatik meg, hogy itt legyek, és én élni akarok,
-=
-1
+None None
+!!!
+0 ===== 2000 ' ------------- ~  ■■
 
 1 le akarom élni az életemet, mégha parancsok és tiltások jármában is, az életemet, amihez rajtam kívül senki
 =
 2
+
+0 császáré legyen. És az életem? Azzal mi lesz? Többször már nem adatik meg, hogy itt legyek, és én élni akarok,
+=
+1
 
 2 másnak nincs joga, az életemet, amelyért senki más nem felel, csak én. És csalódásaimhoz és örömeimhez nem
 =
@@ -14135,10 +14140,6 @@ Skipping footer B: 41 EGY KÖZÖNSÉGES HÉTKÖZNAP
 52 még a tacskómat is bekasztliznák, róla is szó van bennük. Adj egy cigit!
 =
 53
-
-None None
-!!!
-0 ===== 2000 ' ------------- ~  ■■
 
 Page 43
 Skipping header A: 2000 
@@ -14466,13 +14467,17 @@ Skipping footer B: 43 EGY KÖZÖNSÉGES HÉTKÖZNAP
 19 20 3.6464795148249536
 14 15 4.604408053353027
 
-0 Felhúzta a kesztyűjét és morfondírozott: - Na igen, én hová rejtsem? Ha otthon a fáskamrában dugom
+None None
 !!!
-1 Felhúzta a kesztyűjét és morfondírozott: -  Na igen, én hová rejtsem? Ha otthon a fáskamrában dugom
+0 ===== 2000 ____  . . - —
 
 1 el, hát amint beállítanak a csendőrök, rögvest kitalálják, hogy a fáskamrába dugtam a szén alá... vagy vigyem
 =
 2
+
+0 Felhúzta a kesztyűjét és morfondírozott: - Na igen, én hová rejtsem? Ha otthon a fáskamrában dugom
+!!!
+1 Felhúzta a kesztyűjét és morfondírozott: -  Na igen, én hová rejtsem? Ha otthon a fáskamrában dugom
 
 2 el a nagyanyámhoz és rejtsem el az almáriumban? Akkor viszont egy árva szóval sem szabad említenem
 =
@@ -14678,10 +14683,6 @@ Skipping footer B: 43 EGY KÖZÖNSÉGES HÉTKÖZNAP
 =
 53
 
-None None
-!!!
-0 ===== 2000 ____  . . - —
-
 Page 45
 Skipping header A: ===== 2000 ==^=====================^^======^=== 
 Skipping footer A: 44 BOHUMIL HRABAL 
@@ -14773,13 +14774,17 @@ Skipping footer B: 44 BOH UM IL H RA BA L
 0 1 5.482555811902645
 15 16 34.762153451647336
 
-0 Az ajtóban hátrafordult és halkan hozzáfűzte és ujját cinkosán a szájára tette: - Ma délután van egy kis
+None None
 !!!
-1 Az ajtóban hátrafordult és halkan hozzáfűzte és ujját cinkosan a szájára tette: -  Ma délután van egy kis
+0 ---------  " 2000 '
 
 1 időm, úgyhogy befejezem azt a verset Konstantin Bieblről, csak most látom világosan Kosíát, a fogorvos
 !!!
 2 időm, úgyhogy befejezem azt a verset Konstantin Bieblről, csak most látom világosan Kostát, a fogorvos
+
+0 Az ajtóban hátrafordult és halkan hozzáfűzte és ujját cinkosán a szájára tette: - Ma délután van egy kis
+!!!
+1 Az ajtóban hátrafordult és halkan hozzáfűzte és ujját cinkosan a szájára tette: -  Ma délután van egy kis
 
 2 urat és költőt... és rendesen kiszínezem... Este a Messinai örömlányt játsszuk.
 !!!
@@ -14985,6 +14990,10 @@ Skipping footer B: 44 BOH UM IL H RA BA L
 =
 54
 
+None None
+!!!
+52 hozzátette:
+
 53 és Prágában egész sor embert tartóztattak le, akik a
 =
 55
@@ -15116,14 +15125,6 @@ Skipping footer B: 44 BOH UM IL H RA BA L
 85 serűséggel, dühvel, acsarkodással és gyűlölködéssel fo-
 !!!
 87 serűséggel, dühvei, acsarkodással és gyűlölködéssel fo-
-
-None None
-!!!
-0 ---------  " 2000 '
-
-None None
-!!!
-52 hozzátette:
 
 Page 46
 Skipping header A: ===== 2000 
@@ -15303,6 +15304,10 @@ None None
 =
 32
 
+None None
+!!!
+33 1 • • 1 J
+
 34 1 * * 1 1 "
 !!!
 None None
@@ -15310,10 +15315,6 @@ None None
 35 kolto
 =
 34
-
-None None
-!!!
-33 1 • • 1 J
 
 None None
 !!!
@@ -15353,6 +15354,10 @@ Skipping footer B: 46 BERTÓK LÁSZLÓ
 15 16 4.710587128349903
 1 2 7.540852099549077
 16 17 13.12312049004999
+
+None None
+!!!
+0 BERTÓK LÁSZLÓ
 
 0 Toporog a kör közepén
 =
@@ -15478,10 +15483,6 @@ Skipping footer B: 46 BERTÓK LÁSZLÓ
 !!!
 None None
 
-None None
-!!!
-0 BERTÓK LÁSZLÓ
-
 Page 48
 Skipping header A: RAKOVSZKY ZSUZSA 
 Skipping footer A: 47 RAKOVSZKY ZSUZSA 
@@ -15525,6 +15526,10 @@ Skipping footer B: 47 RAKOVSZKY ZSUZSA
 35 36 6.8738577988668546
 38 39 7.494561205102345
 1 2 9.682520344363587
+
+None None
+!!!
+0 RAKOVSZKY ZSUZSA
 
 0 Műsorzárás
 =
@@ -15681,10 +15686,6 @@ Skipping footer B: 47 RAKOVSZKY ZSUZSA
 38 „műsorzárás után" sistergő, szürke mákja.
 !!!
 39 „műsorzárás után”  sistergő, szürke mákja.
-
-None None
-!!!
-0 RAKOVSZKY ZSUZSA
 
 Page 49
 Skipping footer A: 48 RAKOVSZKY ZSUZSA 
@@ -15865,4 +15866,4 @@ Skipping footer B: 48 RAKOVSZKY ZSUZSA
 =
 16
 
-Time 0.406566858291626
+Time 0.4219932556152344
