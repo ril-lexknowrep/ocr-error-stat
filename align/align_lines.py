@@ -1,8 +1,10 @@
-from sys import argv
+from sys import stderr
 import json
+import argparse
 import numpy as np
 from scipy.spatial.distance import cdist
 import time
+from pathlib import Path
 
 from Levenshtein import distance
 
@@ -12,7 +14,7 @@ HEADER_HEIGHT = 0.1
 FOOTER_HEIGHT = 0.1
 
 
-def list_lines(data, skip_header=True, doc=''):
+def list_lines(data, skip_header=True, doc='', verbose=True):
     if skip_header:
         page_height = data['cropbox'][3] - data['cropbox'][1]
         header_bottom = page_height * HEADER_HEIGHT + data['cropbox'][1]
@@ -38,12 +40,14 @@ def list_lines(data, skip_header=True, doc=''):
         if (skip_header
                 and len(block['lines']) == 1
                 and block['bbox'][1] < top_block_height):
-            print(f"Skipping header {doc}: {block['lines'][0]['text']}")
+            if verbose:
+                print(f"Skipping header {doc}: {block['lines'][0]['text']}")
             continue
         elif (skip_header
-                and len(block['lines']) == 1
-                and block['bbox'][3] > bottom_block_height):
-            print(f"Skipping footer {doc}: {block['lines'][0]['text']}")
+              and len(block['lines']) == 1
+              and block['bbox'][3] > bottom_block_height):
+            if verbose:
+                print(f"Skipping footer {doc}: {block['lines'][0]['text']}")
             continue
 
         for line in block["lines"]:
@@ -65,12 +69,14 @@ def same_row(line_a, line_b):
 def align_1_2(unpaired_this, unpaired_other,
               this_list, other_list,
               this_no_space, other_no_space,
-              this_name, other_name):
+              this_name, other_name,
+              verbose=True):
     '''
     Check unpaired lines for possible 1:2 alignments
     '''
 
     concats = []
+    concats_dict = {}
     concat_texts = []
     new_pairs = []
     unpaired_this_sorted = sorted(unpaired_this,
@@ -84,8 +90,9 @@ def align_1_2(unpaired_this, unpaired_other,
                 concat_texts.append(this_no_space[i] + this_no_space[j])
 
     if concats and unpaired_other:
-        print("Concats")
-        print(concats)
+        if verbose:
+            print("Concats")
+            print(concats)
         # create an array containing the centers of the concatenated lines
         concat_centers = np.array(
             [((this_list[conc[0]]['center'][0]
@@ -112,6 +119,13 @@ def align_1_2(unpaired_this, unpaired_other,
                 else:
                     unp_distance_matrix[i, j] = np.inf
 
+        # TODO: Ezt ki kell javítani, hibás az algoritmus. Nemcsak a this dokumentumon
+        # belül igaz, hogy közös soron van a két összekapcsolandó elem, hanem az
+        # other dokumentumbeli párjuk is közös soron van ezekkel. Így nincs értelme
+        # teljes távolságmátrixszal dolgozni, és könnyen lehet, hogy vertikálisan
+        # rossz helyen levő sort illesztünk, így a helyes pár már nem elérhető, mire sorra
+        # kerül.
+
         while unp_distance_matrix.shape[0] > 0 and unp_distance_matrix.shape[1] > 0:
             min_i, min_j = np.unravel_index(np.argmin(unp_distance_matrix),
                                             unp_distance_matrix.shape)
@@ -122,10 +136,11 @@ def align_1_2(unpaired_this, unpaired_other,
                 unpaired_other_idx = unp_idx_matrix[min_i, min_j] % IDX_MULT
                 concat_1 = this_list[concats[concat_idx][0]]
                 concat_2 = this_list[concats[concat_idx][1]]
-                print(f'{this_name}1', concats[concat_idx][0], concat_1['text'])
-                print(f'{this_name}2', concats[concat_idx][1], concat_2['text'])
-                print(other_name, unpaired_other[unpaired_other_idx],
-                      other_list[unpaired_other[unpaired_other_idx]]['text'])
+                if verbose:
+                    print(f'{this_name}1', concats[concat_idx][0], concat_1['text'])
+                    print(f'{this_name}2', concats[concat_idx][1], concat_2['text'])
+                    print(other_name, unpaired_other[unpaired_other_idx],
+                        other_list[unpaired_other[unpaired_other_idx]]['text'])
 
                 # Change text and coordinates of the left half of the
                 # concatenated line and remove text from the right half
@@ -143,13 +158,13 @@ def align_1_2(unpaired_this, unpaired_other,
 
                 new_pairs.append((concats[concat_idx][0],
                                   unpaired_other[unpaired_other_idx]))
-
+                concats_dict[concats[concat_idx][0]] = concats[concat_idx][1]
                 unp_distance_matrix = np.delete(
                     np.delete(unp_distance_matrix, min_i, axis=0), min_j, axis=1)
                 unp_idx_matrix = np.delete(
                     np.delete(unp_idx_matrix, min_i, axis=0), min_j, axis=1)
 
-    return new_pairs
+    return new_pairs, concats_dict
 
 
 def find_unpaired(a_list, b_list, pairs_dict):
@@ -161,17 +176,42 @@ def find_unpaired(a_list, b_list, pairs_dict):
     return unpaired_a, unpaired_b
 
 
+def argparser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('a_file')
+    parser.add_argument('b_file')
+    parser.add_argument('--a_label', '-a', type=str, default='A')
+    parser.add_argument('--b_label', '-b', type=str, default='B')
+    parser.add_argument('--verbose', '-v', type=int, default=0,
+                        help='Verbosity levels: full (2), diff (1), false (0)')
+    parser.add_argument('--output_dir', '-o', type=str, default='.')
+    return parser.parse_args()
+
+
 def main():
+    args = argparser()
     start_t = time.time()
-    with (open(argv[1]) as a_file,
-        open(argv[2]) as b_file):
+    with (open(args.a_file) as a_file,
+        open(args.b_file) as b_file):
         doc_a = json.load(a_file)
         doc_b = json.load(b_file)
 
+    if args.verbose:
+        print(f'{args.a_label} file: {args.a_file}')
+        print(f'{args.b_label} file: {args.b_file}')
+        print()
+
+    outdict = {'a_file': args.a_file,
+               'b_file': args.b_file,
+               'pages': []}
+
     for p_num in range(min(len(doc_a['pages']), len(doc_b['pages']))):
-        print("Page", p_num)
-        a_list = list_lines(doc_a['pages'][p_num], doc='A')
-        b_list = list_lines(doc_b['pages'][p_num], doc='B')
+        if args.verbose:
+            print("Page", p_num)
+        a_list = list_lines(doc_a['pages'][p_num], doc=args.a_label,
+                            verbose=args.verbose)
+        b_list = list_lines(doc_b['pages'][p_num], doc=args.b_label,
+                            verbose=args.verbose)
 
         a_no_space = [a['text'].replace(' ', '')
                       for a in a_list]
@@ -208,8 +248,9 @@ def main():
             else:
                 line_a = idx_matrix[min_i, min_j] // IDX_MULT
                 line_b = idx_matrix[min_i, min_j] % IDX_MULT
-                pairs_dict[line_a] = line_b
-                print(line_a, line_b, distance_matrix[min_i, min_j])
+                pairs_dict[int(line_a)] = int(line_b)
+                if args.verbose == 2:
+                    print(line_a, line_b, distance_matrix[min_i, min_j])
                 distance_matrix = np.delete(
                     np.delete(distance_matrix, min_i, axis=0), min_j, axis=1)
                 idx_matrix = np.delete(
@@ -217,16 +258,18 @@ def main():
 
         unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
 
-        new_pairs = align_1_2(unpaired_a, unpaired_b, a_list, b_list,
-                              a_no_space, b_no_space, 'A', 'B')
+        new_pairs, a_concats = align_1_2(
+            unpaired_a, unpaired_b, a_list, b_list, a_no_space, b_no_space,
+            args.a_label, args.b_label, args.verbose)
 
         for a, b in new_pairs:
             pairs_dict[a] = b
 
         unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
 
-        new_pairs = align_1_2(unpaired_b, unpaired_a, b_list, a_list,
-                              b_no_space, a_no_space, 'B', 'A')
+        new_pairs, b_concats = align_1_2(
+            unpaired_b, unpaired_a, b_list, a_list, b_no_space, a_no_space,
+            args.b_label, args.a_label, args.verbose)
         for b, a in new_pairs:
             pairs_dict[a] = b
 
@@ -236,13 +279,19 @@ def main():
 
         unpaired_a, unpaired_b = find_unpaired(a_list, b_list, pairs_dict)
 
+        pairs_dict[None] = []
+
         for a in unpaired_a:
+            pairs_dict[a] = None
             pairs_list.append((a, None))
         for b in unpaired_b:
+            pairs_dict[None].append(b)
             pairs_list.append((None, b))
 
         pairs_list = sorted(pairs_list, key=lambda x: (x[0] or 0) or (x[1] or 0))
-        print()
+
+        if args.verbose:
+            print()
 
         for line_a, line_b in pairs_list:
             try:
@@ -253,15 +302,43 @@ def main():
                 b_text = b_list[line_b]['text'].rstrip().replace("\u00AD", "-")
             except:
                 b_text = None
-            print(line_a, a_text)
-            if a_text == b_text:
-                print("=")
-                print(line_b)
-            else:
-                print("!!!")
-                print(line_b, b_text)
-            print()
-    print("Time", time.time() - start_t)
+            if args.verbose and line_a is not None and line_b is not None:
+                if line_a in a_concats:
+                    line_a = (line_a, a_concats[line_a])
+                if line_b in b_concats:
+                    line_b = (line_b, b_concats[line_b])
+                if a_text != b_text:
+                    print(line_a, a_text)
+                    print("!!!")
+                    print(line_b, b_text)
+                    print()
+                elif args.verbose == 2:
+                    print(line_a, a_text)
+                    print("=")
+                    print(line_b)
+                    print()
+
+        del_keys = []
+        new_pairs = {}
+        for k, v in pairs_dict.items():
+#            print(k, type(k), v, type(v))
+            if k in a_concats:
+                new_pairs[f'{k}+{a_concats[k]}'] = v
+                del_keys.append(k)
+            if type(v) == int and v in b_concats:
+                pairs_dict[k] = f'{v}+{b_concats[v]}'
+        for k in del_keys:
+            del pairs_dict[k]
+        pairs_dict.update(new_pairs)
+
+        outdict['pages'].append(pairs_dict)
+
+    json_file = (args.output_dir + '/' + Path(args.a_file).stem
+                 + f'_{args.a_label}_{args.b_label}.json')
+    with open(json_file, 'w', encoding='utf-8') as outfile:
+        json.dump(outdict, outfile)
+    print(json_file, file=stderr)
+    print("Time", time.time() - start_t, file=stderr)
 
 if __name__ == '__main__':
     main()

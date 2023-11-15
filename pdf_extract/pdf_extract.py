@@ -2,10 +2,14 @@ import json
 from sys import argv
 import fitz
 
+PDF_FLAGS = (fitz.TEXT_PRESERVE_WHITESPACE
+             | fitz.TEXT_INHIBIT_SPACES
+             | fitz.TEXT_MEDIABOX_CLIP)
+
 
 def restructure_pdf(page_pdf):
     output_dict = {}
-    page_dict = page_pdf.get_textpage().extractDICT()
+    page_dict = page_pdf.get_text("dict", flags=PDF_FLAGS)
     # The cropbox is a Rect object which can't be serialised by json
     output_dict['cropbox'] = to_tuple(page_pdf.cropbox)
     output_dict['blocks'] = []
@@ -60,4 +64,9 @@ def process_pdf(pdf_path, output_path):
         json.dump(output_data, json_out)
 
 
-process_pdf(argv[1], argv[2])
+def main():
+    process_pdf(argv[1], argv[2])
+
+
+if __name__ == '__main__':
+    main()
