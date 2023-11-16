@@ -63,11 +63,15 @@ perplexities = [pred['substr-perpl'] for pred in preds]
 split_preds = split_into(perplexities, split_counts)
 split_sources = split_into(sources, split_counts)
 
-outfile = open(diff_fname[:-len('.json')] + "_eval.txt", 'w', encoding='utf-8')
+outfile = open(diff_fname[:-len('.json')] + "_eval.tsv", 'w', encoding='utf-8')
+out_dict = {'diff_file': diff_fname, "a_label": a_label,
+            "b_label": b_label, "alt_sets": []}
 
 for line_context, line_diffs, line_prs, line_srcs in zip(
                                 contexts, diffs, split_preds, split_sources):
     best_pred = min(line_prs)
+    out_dict['alt_sets'].append({'diffs': line_diffs, 'winners': [],
+                                 'min_perplexities': []})
     print('', file=outfile)
     for ix, diff in enumerate(line_diffs):
         a_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'a']
@@ -78,19 +82,16 @@ for line_context, line_diffs, line_prs, line_srcs in zip(
             winner = 'a'
         else:
             winner = 'b'
+        out_dict['alt_sets'][-1]['winners'].append(winner)
+        out_dict['alt_sets'][-1]['min_perplexities'].append(
+            {'a': min_a, 'b': min_b})
+
         print('\t'.join([f"›{diff['a']}‹", f"›{diff['b']}‹",
                          f'›{diff[winner]}‹',
                          f'{min_a:.4f}', f'{min_b:.4f}', line_context]),
               file=outfile)
+    assert len(out_dict['alt_sets'][-1]['diffs']) == len(out_dict['alt_sets'][-1]['winners'])
+outfile.close()
 
-# print(len(split_counts))
-# print(len(sequences))
-
-# from more_itertools import split_into
-
-# split_texts = split_into(sequences, split_counts)
-
-# for split in split_texts:
-#     for line in split:
-#         print(line)
-#     print()
+with open(diff_fname[:-len('.json')] + '_eval.json', 'w') as out_json:
+    json.dump(out_dict, out_json)
