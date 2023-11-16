@@ -1,4 +1,7 @@
 import json
+from sys import path
+from more_itertools import split_into
+
 CLM_PATH = '/storage/sata2tbssd/character_language_models/'
 path.append(CLM_PATH)
 
@@ -11,11 +14,16 @@ output_enc = OutputEncoder(file=CLM_PATH+"output_encoder.json")
 bilstm_model = lstm_model.BiLSTM_Model.load(
     CLM_PATH + 'bilstm_model_512.h5', input_enc, output_enc)
 
-with open('fr15output_FR15_FR16_diffs.json') as json_file:
+diff_fname = 'fr15output_FR15_FR16_diffs.json'
+
+with open(diff_fname) as json_file:
     diff_dict = json.load(json_file)
 
 a_label = diff_dict['a_label']
 b_label = diff_dict['b_label']
+
+diffs = []
+contexts = []
 
 sequences = []
 sources = []
@@ -26,6 +34,8 @@ end_indices = []
 
 for alt_set in diff_dict['alt_sets']:
     split_counts.append(len(alt_set['alternatives']))
+    diffs.append(alt_set['diffs'])
+    contexts.append(alt_set['context'])
     for alt in alt_set['alternatives']:
         sequences.append(alt['text'])
         sources.append(alt['sources'])
@@ -46,8 +56,32 @@ assert len(preds) == len(sequences)
 
 perplexities = [pred['substr-perpl'] for pred in preds]
 
-for perpl, text, start, end in zip(perplexities, sequences, start_indices, end_indices):
-    print(perpl, text[start:end])
+# for perpl, text, start, end in zip(perplexities, sequences,
+#                                    start_indices, end_indices):
+#     print(perpl, text[start:end])
+
+split_preds = split_into(perplexities, split_counts)
+split_sources = split_into(sources, split_counts)
+
+outfile = open(diff_fname[:-len('.json')] + "_eval.txt", 'w', encoding='utf-8')
+
+for line_context, line_diffs, line_prs, line_srcs in zip(
+                                contexts, diffs, split_preds, split_sources):
+    best_pred = min(line_prs)
+    print('', file=outfile)
+    for ix, diff in enumerate(line_diffs):
+        a_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'a']
+        b_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'b']
+        min_a = min(a_preds)
+        min_b = min(b_preds)
+        if min_a < min_b:
+            winner = 'a'
+        else:
+            winner = 'b'
+        print('\t'.join([f"›{diff['a']}‹", f"›{diff['b']}‹",
+                         f'›{diff[winner]}‹',
+                         f'{min_a:.4f}', f'{min_b:.4f}', line_context]),
+              file=outfile)
 
 # print(len(split_counts))
 # print(len(sequences))
