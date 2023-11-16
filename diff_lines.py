@@ -4,6 +4,12 @@ from align.align_lines import list_lines
 import networkx as nx
 import difflib
 
+LR_CONTEXT = 30  # left/right context required by the LM to decide on a target sequence
+
+# characters to be evaluated to the left of the first diff
+# and to the right of the last diff as part of the target sequence
+TARGET_CONTEXT = 5 
+MAX_DIFFS_PER_LINE = 6
 
 class DiffSegment:
     '''A class that provides a comfortable interface for difflib diffs.'''
@@ -125,19 +131,50 @@ def get_diff_string(segs):
     for seg in segs:
         if seg.tag == 'equal':
             seg_string += seg['a']
-        elif seg.tag == 'replace':
+        else:
             seg_string += f'[{seg["a"]}/{seg["b"]}]'
-        elif seg.tag == 'insert':
-            seg_string += f'[/{seg["b"]}]'
-        elif seg.tag == 'delete':
-            seg_string += f'[{seg["a"]}/]'
     return(seg_string)
+
+
+def remove_hyphen(text, r_context):
+    if len(text) > 2 and text[-1] == '-' and text [-2] != ' ':
+        if ((text.endswith('sz-')
+            and any(t.startswith('sz') for t in r_context))
+            or
+            (text.endswith('zs-')
+            and any(t.startswith('zs') for t in r_context))
+            or
+            (text.endswith('cs-')
+            and any(t.startswith('cs') for t in r_context))
+            or
+            (text[-2] == 'y'
+            and
+            (text.endswith('gy-')
+            and any(t.startswith('gy') for t in r_context))
+            or
+            (text.endswith('ny-')
+            and any(t.startswith('ny') for t in r_context))
+            or
+            (text.endswith('ty-')
+            and any(t.startswith('ty') for t in r_context))
+            or
+            (text.endswith('ly-')
+            and any(t.startswith('ly') for t in r_context)))
+        ):
+            return text[:-2], 2
+        elif text[-2].isupper() or text[-2].isnumeric():
+            return text, 0
+        else:
+            return text[:-1], 1
+    else:
+        return text + ' ', -1
 
 
 def clean_str(s):
     return s.strip().replace('\xad', '-')
 
 def main():
+    print(argv[1])
     with open(argv[1]) as alignment_file:
         alignment = json.load(alignment_file)
 
@@ -147,8 +184,16 @@ def main():
     with open(alignment['b_file']) as b_file:
         b_data = json.load(b_file)
 
+    diff_dict = {
+        'alignment_file': argv[1],
+        'a_label': 'FR14',
+        'b_label': 'FR15',
+        # 'a_label': alignment['a_label'],
+        # 'b_label': alignment['b_label'],
+        'alt_sets': []}
+
     for page_num, page in enumerate(alignment['pages']):
-        print("page", page_num)
+#        print("page", page_num)
         a_page = list_lines(a_data['pages'][page_num], verbose=False)
         b_page = list_lines(b_data['pages'][page_num], verbose=False)
 
@@ -183,9 +228,20 @@ def main():
             matcher.set_seqs(a_text, b_text)
             opcodes = matcher.get_opcodes()
             segs = [DiffSegment(*opcode, a_text, b_text) for opcode in opcodes]
+            num_diffs = sum(1 for seg in segs if seg.tag != 'equal')
             graph, node_text, node_source = diffs_to_graph(segs)
             path_texts, path_sources = graph_paths(graph, node_text, node_source)
-            print(len(path_texts), get_diff_string(segs))
+            if num_diffs > MAX_DIFFS_PER_LINE:
+                continue
+#            print(num_diffs, len(path_texts), get_diff_string(segs))
+
+            diff_list = [{'a': seg["a"], 'b': seg['b']}
+                            for seg in segs
+                            if seg.tag != 'equal']
+
+            diff_dict['alt_sets'].append(
+                {'a_text': a_text, 'b_text': b_text, 'diffs': diff_list,
+                 'context': '', 'alternatives': []})
 
             ROOT_NODE = 0
             # if root branches immediately
@@ -201,6 +257,123 @@ def main():
                 diff_end = 0   # counting from the end
             else:
                 diff_end = len(node_text[final_node])
+
+            # add previous line for additional left context if necessary
+            l_missing = TARGET_CONTEXT + LR_CONTEXT - diff_start
+
+            a_prev_text = ''
+            if a_prev_line >= 0:
+                a_prev_text = clean_str(a_page[a_prev_line]['text'])
+
+            b_prev_text = ''
+            if b_prev_line >= 0:
+                b_prev_text = clean_str(b_page[b_prev_line]['text'])
+
+            a_next_text = ''
+            if a_next_line < len(a_page):
+                a_next_text = clean_str(a_page[a_next_line]['text'])
+
+            b_next_text = ''
+            if b_next_line < len(b_page):
+                b_next_text = clean_str(b_page[b_next_line]['text'])
+
+            if l_missing <= 0:
+                l_context = ['']
+            elif a_prev_text == b_prev_text and a_next_text == b_next_text:
+                l_context = [a_prev_text]
+            else:
+                l_context = [a_prev_text, b_prev_text]
+            
+            for ix, prev_line in enumerate(l_context):
+                if len(prev_line) > 2 and prev_line[-1] == '-' and prev_line [-2] != ' ':
+                    if ((prev_line.endswith('sz-')
+                        and (a_text.startswith('sz') or b_text.startswith('sz')))
+                        or
+                        (prev_line.endswith('zs-')
+                        and (a_text.startswith('zs') or b_text.startswith('zs')))
+                        or
+                        (prev_line.endswith('cs-')
+                        and (a_text.startswith('cs') or b_text.startswith('cs')))
+                        or
+                        (prev_line[-2] == 'y'
+                        and
+                        (prev_line.endswith('gy-')
+                        and (a_text.startswith('gy') or b_text.startswith('gy')))
+                        or
+                        (prev_line.endswith('ny-')
+                        and (a_text.startswith('ny') or b_text.startswith('ny')))
+                        or
+                        (prev_line.endswith('ty-')
+                        and (a_text.startswith('ty') or b_text.startswith('ty')))
+                        or
+                        (prev_line.endswith('ly-')
+                        and (a_text.startswith('ly') or b_text.startswith('ly'))))
+                    ):
+                        l_context[ix] = prev_line[:-2]
+                    elif prev_line[-2].isupper() or prev_line[-2].isnumeric():
+                        l_context[ix] = prev_line
+                    else:
+                        l_context[ix] = prev_line[:-1]
+                else:
+                    l_context[ix] = prev_line + ' '
+
+            eval_start = []
+            for prev_line in l_context:
+                eval_start.append(max(0, diff_start + len(prev_line) - TARGET_CONTEXT))
+
+            # add next line for additional right context if necessary
+            r_missing = TARGET_CONTEXT + LR_CONTEXT - diff_end
+
+            if r_missing <= 0:
+                r_context = ['']
+            elif a_prev_text == b_prev_text and a_next_text == b_next_text:
+                r_context = [a_next_text]
+            else:
+                r_context = [a_next_text, b_next_text]
+            
+            # check whether a_text and b_text end in a hyphen
+
+            _, a_removed = remove_hyphen(a_text, r_context)
+            _, b_removed = remove_hyphen(b_text, r_context)
+
+            # generate alternatives
+
+            diff_dict['alt_sets'][-1]['context'] =\
+                ' // '.join([l_context[0], get_diff_string(segs), r_context[0]])
+
+            for text_variant, sources in zip(path_texts, path_sources):
+                for lc, rc, start in zip(l_context, r_context, eval_start):
+                    if a_removed >= 0 and sources[-1] == 'a':
+                        if a_removed:
+                            center = text_variant[:-a_removed]
+                        else:
+                            center = text_variant
+                        end = max(0, diff_end - TARGET_CONTEXT + len(rc) - a_removed)
+                    elif b_removed >= 0 and sources[-1] == 'b':
+                        if b_removed:
+                            center = text_variant[:-b_removed]
+                        else:
+                            center = text_variant
+                        end = max(0, diff_end - TARGET_CONTEXT + len(rc) - b_removed)
+                    else:
+                        center = text_variant + ' '
+                        end = max(0, diff_end - TARGET_CONTEXT + len(rc) + 1)
+                    concat_text = lc + center + rc
+                    conc_end = len(concat_text) - end
+                    # print('CENT', center)
+                    # print('LC:', lc)
+                    # print('RC:', rc)
+                    # print('CC:', concat_text)
+                    eval_span = concat_text[:start] + '##' + concat_text[start:conc_end] + '##' + concat_text[conc_end:]
+#                    print(eval_span)
+#                    print(f"{sources}, {start}, {conc_end}")
+
+                    diff_dict['alt_sets'][-1]['alternatives'].append(
+                        {'text': concat_text, 'sources': sources,
+                         'start': start, 'end': conc_end})
+
+    with open(argv[1][:-len('.json')] + '_diffs.json', 'w', encoding='utf-8') as diff_file:
+        json.dump(diff_dict, diff_file)
 
 if __name__ == '__main__':
     main()
