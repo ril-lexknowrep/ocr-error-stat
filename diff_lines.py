@@ -229,10 +229,11 @@ def main():
             opcodes = matcher.get_opcodes()
             segs = [DiffSegment(*opcode, a_text, b_text) for opcode in opcodes]
             num_diffs = sum(1 for seg in segs if seg.tag != 'equal')
-            graph, node_text, node_source = diffs_to_graph(segs)
-            path_texts, path_sources = graph_paths(graph, node_text, node_source)
             if num_diffs > MAX_DIFFS_PER_LINE:
                 continue
+
+            graph, node_text, node_source = diffs_to_graph(segs)
+            path_texts, path_sources = graph_paths(graph, node_text, node_source)
 #            print(num_diffs, len(path_texts), get_diff_string(segs))
 
             diff_list = [{'a': seg["a"], 'b': seg['b']}
