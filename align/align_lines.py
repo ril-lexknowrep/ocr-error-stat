@@ -203,6 +203,8 @@ def main():
 
     outdict = {'a_file': args.a_file,
                'b_file': args.b_file,
+               'a_label': args.a_label,
+               'b_label': args.b_label,
                'pages': []}
 
     for p_num in range(min(len(doc_a['pages']), len(doc_b['pages']))):

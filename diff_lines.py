@@ -188,10 +188,8 @@ def main():
 
     diff_dict = {
         'alignment_file': argv[1],
-        'a_label': 'FR14',
-        'b_label': 'FR15',
-        # 'a_label': alignment['a_label'],
-        # 'b_label': alignment['b_label'],
+        'a_label': alignment['a_label'],
+        'b_label': alignment['b_label'],
         'alt_sets': []}
 
     for page_num, page in enumerate(alignment['pages']):
