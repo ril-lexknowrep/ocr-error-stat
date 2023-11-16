@@ -3,6 +3,7 @@ from sys import argv
 from align.align_lines import list_lines
 import networkx as nx
 import difflib
+from Levenshtein import distance
 
 LR_CONTEXT = 30  # left/right context required by the LM to decide on a target sequence
 
@@ -10,6 +11,7 @@ LR_CONTEXT = 30  # left/right context required by the LM to decide on a target s
 # and to the right of the last diff as part of the target sequence
 TARGET_CONTEXT = 5 
 MAX_DIFFS_PER_LINE = 6
+MAX_DISTANCE_PER_LINE = 20
 
 class DiffSegment:
     '''A class that provides a comfortable interface for difflib diffs.'''
@@ -222,6 +224,9 @@ def main():
                 b_next_line = int(v) + 1
 
             if a_text == b_text:
+                continue
+
+            if distance(a_text, b_text) > MAX_DISTANCE_PER_LINE:
                 continue
 
             matcher = difflib.SequenceMatcher(autojunk=False)
