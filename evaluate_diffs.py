@@ -4,11 +4,13 @@ from pathlib import Path
 from sys import path, argv
 from more_itertools import split_into
 
-CLM_PATH = '/storage/sata2tbssd/character_language_models/'
+CLM_PATH = '/home/ubuntu/character_language_models/'
 path.append(CLM_PATH)
 
 import lstm_model
 from encode_characters import InputEncoder, OutputEncoder
+
+MAX_DIFFS_PER_DOC = 30000
 
 input_enc = InputEncoder(file=CLM_PATH+"input_encoder.json")
 output_enc = OutputEncoder(file=CLM_PATH+"output_encoder.json")
@@ -63,7 +65,7 @@ for diff_fname in diff_files:
 
     preds = bilstm_model.predict_subsequences(
         sequences, start_indices=None, end_indices=None,
-        token_dicts=False, batch_size=2048)
+        token_dicts=False, batch_size=4096)
 
 #    print(len(preds))
     assert len(preds) == len(sequences)
