@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from sys import path, argv
 from more_itertools import split_into
 
@@ -21,6 +22,9 @@ diff_files = os.listdir(diff_dir)
 for diff_fname in diff_files:
     print(diff_fname)
     if not diff_fname.endswith('_diffs.json'):
+        continue
+
+    if Path(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json').exists:
         continue
 
     with open(diff_dir + '/' + diff_fname) as json_file:
