@@ -1,6 +1,6 @@
 import json
 import os
-from sys import path
+from sys import path, argv
 from more_itertools import split_into
 
 CLM_PATH = '/storage/sata2tbssd/character_language_models/'
@@ -15,14 +15,15 @@ output_enc = OutputEncoder(file=CLM_PATH+"output_encoder.json")
 bilstm_model = lstm_model.BiLSTM_Model.load(
     CLM_PATH + 'bilstm_model_512.h5', input_enc, output_enc)
 
-diff_dir = 'diffs/'
+diff_dir = argv[1]
 diff_files = os.listdir(diff_dir)
 
 for diff_fname in diff_files:
+    print(diff_fname)
     if not diff_fname.endswith('_diffs.json'):
         continue
 
-    with open(diff_dir + diff_fname) as json_file:
+    with open(diff_dir + '/' + diff_fname) as json_file:
         diff_dict = json.load(json_file)
 
     a_label = diff_dict['a_label']
@@ -55,9 +56,9 @@ for diff_fname in diff_files:
 
     preds = bilstm_model.predict_subsequences(
         sequences, start_indices=None, end_indices=None,
-        token_dicts=False, batch_size=1024)
+        token_dicts=False, batch_size=12000)
 
-    print(len(preds))
+#    print(len(preds))
     assert len(preds) == len(sequences)
 
     perplexities = [pred['substr-perpl'] for pred in preds]
@@ -69,7 +70,7 @@ for diff_fname in diff_files:
     split_preds = split_into(perplexities, split_counts)
     split_sources = split_into(sources, split_counts)
 
-    outfile = open(diff_dir + diff_fname[:-len('.json')] + "_eval.tsv",
+    outfile = open(diff_dir + '/' + diff_fname[:-len('.json')] + "_eval.tsv",
                    'w', encoding='utf-8')
     out_dict = {'diff_file': diff_fname, "a_label": a_label,
                 "b_label": b_label, "alt_sets": []}
@@ -101,6 +102,6 @@ for diff_fname in diff_files:
             len(out_dict['alt_sets'][-1]['winners'])
     outfile.close()
 
-    with open(diff_dir + diff_fname[:-len('.json')] + '_eval.json',
+    with open(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json',
               'w') as out_json:
         json.dump(out_dict, out_json)
