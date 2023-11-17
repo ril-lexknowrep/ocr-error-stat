@@ -24,7 +24,7 @@ for diff_fname in diff_files:
     if not diff_fname.endswith('_diffs.json'):
         continue
 
-    if Path(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json').exists:
+    if Path(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json').exists():
         continue
 
     with open(diff_dir + '/' + diff_fname) as json_file:
