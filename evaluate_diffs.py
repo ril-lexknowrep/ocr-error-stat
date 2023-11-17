@@ -4,7 +4,7 @@ from pathlib import Path
 from sys import path, argv
 from more_itertools import split_into
 
-CLM_PATH = '/home/ubuntu/character_language_models/'
+CLM_PATH = '/storage/sata2tbssd/character_language_models/'
 path.append(CLM_PATH)
 
 import lstm_model
@@ -60,12 +60,12 @@ for diff_fname in diff_files:
     assert len(sequences) == len(end_indices)
     print(len(sequences))
 
-    if len(sequences) == 0:
+    if len(sequences) == 0 or len(sequences) > MAX_DIFFS_PER_DOC:
         continue
 
     preds = bilstm_model.predict_subsequences(
         sequences, start_indices=None, end_indices=None,
-        token_dicts=False, batch_size=4096)
+        token_dicts=False, batch_size=12000)
 
 #    print(len(preds))
     assert len(preds) == len(sequences)
