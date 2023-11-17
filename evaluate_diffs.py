@@ -54,9 +54,12 @@ for diff_fname in diff_files:
     assert len(sequences) == len(end_indices)
     print(len(sequences))
 
+    if len(sequences) == 0:
+        continue
+
     preds = bilstm_model.predict_subsequences(
         sequences, start_indices=None, end_indices=None,
-        token_dicts=False, batch_size=12000)
+        token_dicts=False, batch_size=2048)
 
 #    print(len(preds))
     assert len(preds) == len(sequences)
