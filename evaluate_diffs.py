@@ -1,4 +1,5 @@
 import json
+import os
 from sys import path
 from more_itertools import split_into
 
@@ -14,84 +15,92 @@ output_enc = OutputEncoder(file=CLM_PATH+"output_encoder.json")
 bilstm_model = lstm_model.BiLSTM_Model.load(
     CLM_PATH + 'bilstm_model_512.h5', input_enc, output_enc)
 
-diff_fname = 'fr15output_FR15_FR16_diffs.json'
+diff_dir = 'diffs/'
+diff_files = os.listdir(diff_dir)
 
-with open(diff_fname) as json_file:
-    diff_dict = json.load(json_file)
+for diff_fname in diff_files:
+    if not diff_fname.endswith('_diffs.json'):
+        continue
 
-a_label = diff_dict['a_label']
-b_label = diff_dict['b_label']
+    with open(diff_dir + diff_fname) as json_file:
+        diff_dict = json.load(json_file)
 
-diffs = []
-contexts = []
+    a_label = diff_dict['a_label']
+    b_label = diff_dict['b_label']
 
-sequences = []
-sources = []
-split_counts = []
+    diffs = []
+    contexts = []
 
-start_indices = []
-end_indices = []
+    sequences = []
+    sources = []
+    split_counts = []
 
-for alt_set in diff_dict['alt_sets']:
-    split_counts.append(len(alt_set['alternatives']))
-    diffs.append(alt_set['diffs'])
-    contexts.append(alt_set['context'])
-    for alt in alt_set['alternatives']:
-        sequences.append(alt['text'])
-        sources.append(alt['sources'])
-        start_indices.append(alt['start'])
-        end_indices.append(alt['end'])
+    start_indices = []
+    end_indices = []
 
-assert len(sequences) == len(sources)
-assert len(sequences) == len(start_indices)
-assert len(sequences) == len(end_indices)
-print(len(sequences))
+    for alt_set in diff_dict['alt_sets']:
+        split_counts.append(len(alt_set['alternatives']))
+        diffs.append(alt_set['diffs'])
+        contexts.append(alt_set['context'])
+        for alt in alt_set['alternatives']:
+            sequences.append(alt['text'])
+            sources.append(alt['sources'])
+            start_indices.append(alt['start'])
+            end_indices.append(alt['end'])
 
-preds = bilstm_model.predict_subsequences(
-    sequences, start_indices=None, end_indices=None,
-    token_dicts=False, batch_size=1024)
+    assert len(sequences) == len(sources)
+    assert len(sequences) == len(start_indices)
+    assert len(sequences) == len(end_indices)
+    print(len(sequences))
 
-print(len(preds))
-assert len(preds) == len(sequences)
+    preds = bilstm_model.predict_subsequences(
+        sequences, start_indices=None, end_indices=None,
+        token_dicts=False, batch_size=1024)
 
-perplexities = [pred['substr-perpl'] for pred in preds]
+    print(len(preds))
+    assert len(preds) == len(sequences)
 
-# for perpl, text, start, end in zip(perplexities, sequences,
-#                                    start_indices, end_indices):
-#     print(perpl, text[start:end])
+    perplexities = [pred['substr-perpl'] for pred in preds]
 
-split_preds = split_into(perplexities, split_counts)
-split_sources = split_into(sources, split_counts)
+    # for perpl, text, start, end in zip(perplexities, sequences,
+    #                                    start_indices, end_indices):
+    #     print(perpl, text[start:end])
 
-outfile = open(diff_fname[:-len('.json')] + "_eval.tsv", 'w', encoding='utf-8')
-out_dict = {'diff_file': diff_fname, "a_label": a_label,
-            "b_label": b_label, "alt_sets": []}
+    split_preds = split_into(perplexities, split_counts)
+    split_sources = split_into(sources, split_counts)
 
-for line_context, line_diffs, line_prs, line_srcs in zip(
+    outfile = open(diff_dir + diff_fname[:-len('.json')] + "_eval.tsv",
+                   'w', encoding='utf-8')
+    out_dict = {'diff_file': diff_fname, "a_label": a_label,
+                "b_label": b_label, "alt_sets": []}
+
+    for line_context, line_diffs, line_prs, line_srcs in zip(
                                 contexts, diffs, split_preds, split_sources):
-    best_pred = min(line_prs)
-    out_dict['alt_sets'].append({'diffs': line_diffs, 'winners': [],
-                                 'min_perplexities': []})
-    print('', file=outfile)
-    for ix, diff in enumerate(line_diffs):
-        a_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'a']
-        b_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'b']
-        min_a = min(a_preds)
-        min_b = min(b_preds)
-        if min_a < min_b:
-            winner = 'a'
-        else:
-            winner = 'b'
-        out_dict['alt_sets'][-1]['winners'].append(winner)
-        out_dict['alt_sets'][-1]['min_perplexities'].append(
-            {'a': min_a, 'b': min_b})
+        best_pred = min(line_prs)
+        out_dict['alt_sets'].append({'diffs': line_diffs, 'winners': [],
+                                    'min_perplexities': []})
+        print('', file=outfile)
+        for ix, diff in enumerate(line_diffs):
+            a_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'a']
+            b_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'b']
+            min_a = min(a_preds)
+            min_b = min(b_preds)
+            if min_a < min_b:
+                winner = 'a'
+            else:
+                winner = 'b'
+            out_dict['alt_sets'][-1]['winners'].append(winner)
+            out_dict['alt_sets'][-1]['min_perplexities'].append(
+                {'a': f'{min_a:.4f}', 'b': f'{min_b:.4f}'})
 
-        print('\t'.join([f"›{diff['a']}‹", f"›{diff['b']}‹",
-                         f'›{diff[winner]}‹',
-                         f'{min_a:.4f}', f'{min_b:.4f}', line_context]),
-              file=outfile)
-    assert len(out_dict['alt_sets'][-1]['diffs']) == len(out_dict['alt_sets'][-1]['winners'])
-outfile.close()
+            print('\t'.join([f"›{diff['a']}‹", f"›{diff['b']}‹",
+                             f'›{diff[winner]}‹',
+                             f'{min_a:.4f}', f'{min_b:.4f}', line_context]),
+                  file=outfile)
+        assert len(out_dict['alt_sets'][-1]['diffs']) ==\
+            len(out_dict['alt_sets'][-1]['winners'])
+    outfile.close()
 
-with open(diff_fname[:-len('.json')] + '_eval.json', 'w') as out_json:
-    json.dump(out_dict, out_json)
+    with open(diff_dir + diff_fname[:-len('.json')] + '_eval.json',
+              'w') as out_json:
+        json.dump(out_dict, out_json)
