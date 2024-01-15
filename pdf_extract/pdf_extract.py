@@ -53,19 +53,27 @@ def to_tuple(rect):
     return (rect.x0, rect.y0, rect.x1, rect.y1)
 
 
-def process_pdf(pdf_path, output_path):
+def process_pdf():
+    try:
+        pdf_path, output_path = argv[1], argv[2]
+    except IndexError:
+        pdf_path, output_path = argv[1], None
     output_data = {'pages': []}
     pdf_document = fitz.open(pdf_path)
 
-    with open(output_path, 'w') as json_out:
-        for page in pdf_document:
-            output_data['pages'].append(
-                restructure_pdf(page))
-        json.dump(output_data, json_out)
+    for page in pdf_document:
+        output_data['pages'].append(
+            restructure_pdf(page))
+
+    if output_path is None:
+        print(json.dumps(output_data))
+    else:
+        with open(output_path, 'w') as json_out:
+            json.dump(output_data, json_out)
 
 
 def main():
-    process_pdf(argv[1], argv[2])
+    process_pdf()
 
 
 if __name__ == '__main__':

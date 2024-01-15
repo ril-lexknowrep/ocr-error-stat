@@ -5,13 +5,15 @@ import networkx as nx
 import difflib
 from Levenshtein import distance
 
-LR_CONTEXT = 30  # left/right context required by the LM to decide on a target sequence
+# left/right context required by the LM to decide on a target sequence
+LR_CONTEXT = 30
 
 # characters to be evaluated to the left of the first diff
 # and to the right of the last diff as part of the target sequence
 TARGET_CONTEXT = 5 
 MAX_DIFFS_PER_LINE = 6
-MAX_DISTANCE_PER_LINE = 20
+MAX_DIST_PER_LINE = 20
+MAX_DIST_RATIO = 0.5
 
 class DiffSegment:
     '''A class that provides a comfortable interface for difflib diffs.'''
@@ -122,7 +124,8 @@ def diffs_to_graph(segs, a_label='a', b_label='b'):
 def graph_paths(graph, node_text, node_source):
     path_texts = []
     path_sources = []
-    for path in list(nx.all_simple_paths(graph, source=0, target=list(graph.nodes)[-1])):
+    for path in list(nx.all_simple_paths(graph, source=0,
+                                         target=list(graph.nodes)[-1])):
         path_texts.append(''.join([node_text.get(e, '') for e in path]))
         path_sources.append(''.join([node_source.get(e, '') for e in path]))
     return path_texts, path_sources
@@ -203,7 +206,8 @@ def main():
             if '+' in k:
                 a_lines = k.split('+')
                 a_lines = [int(a_lines[0]), int(a_lines[1])]
-                a_text = clean_str(a_page[a_lines[0]]['text'] + a_page[a_lines[1]]['text'])
+                a_text = clean_str(a_page[a_lines[0]]['text']
+                                   + a_page[a_lines[1]]['text'])
                 a_prev_line = a_lines[0] - 1
                 a_next_line = a_lines[1] + 1
             else:
@@ -213,7 +217,8 @@ def main():
             if type(v) == str and '+' in v:
                 b_lines = v.split('+')
                 b_lines = [int(b_lines[0]), int(b_lines[1])]
-                b_text = clean_str(b_page[b_lines[0]]['text'] + b_page[b_lines[1]]['text'])
+                b_text = clean_str(b_page[b_lines[0]]['text']
+                                   + b_page[b_lines[1]]['text'])
                 b_prev_line = b_lines[0] - 1
                 b_next_line = b_lines[1] + 1
             else:
@@ -224,19 +229,23 @@ def main():
             if a_text == b_text:
                 continue
 
-            if distance(a_text, b_text) > MAX_DISTANCE_PER_LINE:
+            lev_dist = distance(a_text, b_text)
+            if (lev_dist > MAX_DIST_PER_LINE
+                or lev_dist > min(len(a_text), len(b_text)) * MAX_DIST_RATIO):
                 continue
 
             matcher = difflib.SequenceMatcher(autojunk=False)
             matcher.set_seqs(a_text, b_text)
             opcodes = matcher.get_opcodes()
-            segs = [DiffSegment(*opcode, a_text, b_text) for opcode in opcodes]
+            segs = [DiffSegment(*opcode, a_text, b_text)
+                    for opcode in opcodes]
             num_diffs = sum(1 for seg in segs if seg.tag != 'equal')
             if num_diffs > MAX_DIFFS_PER_LINE:
                 continue
 
             graph, node_text, node_source = diffs_to_graph(segs)
-            path_texts, path_sources = graph_paths(graph, node_text, node_source)
+            path_texts, path_sources = graph_paths(graph, node_text,
+                                                   node_source)
 #            print(num_diffs, len(path_texts), get_diff_string(segs))
 
             diff_list = [{'a': seg["a"], 'b': seg['b']}
@@ -289,29 +298,38 @@ def main():
                 l_context = [a_prev_text, b_prev_text]
             
             for ix, prev_line in enumerate(l_context):
-                if len(prev_line) > 2 and prev_line[-1] == '-' and prev_line [-2] != ' ':
+                if (len(prev_line) > 2
+                    and prev_line[-1] == '-'
+                    and prev_line [-2] != ' '):
                     if ((prev_line.endswith('sz-')
-                        and (a_text.startswith('sz') or b_text.startswith('sz')))
+                        and (a_text.startswith('sz')
+                             or b_text.startswith('sz')))
                         or
                         (prev_line.endswith('zs-')
-                        and (a_text.startswith('zs') or b_text.startswith('zs')))
+                        and (a_text.startswith('zs')
+                             or b_text.startswith('zs')))
                         or
                         (prev_line.endswith('cs-')
-                        and (a_text.startswith('cs') or b_text.startswith('cs')))
+                        and (a_text.startswith('cs')
+                             or b_text.startswith('cs')))
                         or
                         (prev_line[-2] == 'y'
                         and
                         (prev_line.endswith('gy-')
-                        and (a_text.startswith('gy') or b_text.startswith('gy')))
+                        and (a_text.startswith('gy')
+                             or b_text.startswith('gy')))
                         or
                         (prev_line.endswith('ny-')
-                        and (a_text.startswith('ny') or b_text.startswith('ny')))
+                        and (a_text.startswith('ny')
+                             or b_text.startswith('ny')))
                         or
                         (prev_line.endswith('ty-')
-                        and (a_text.startswith('ty') or b_text.startswith('ty')))
+                        and (a_text.startswith('ty')
+                             or b_text.startswith('ty')))
                         or
                         (prev_line.endswith('ly-')
-                        and (a_text.startswith('ly') or b_text.startswith('ly'))))
+                        and (a_text.startswith('ly')
+                             or b_text.startswith('ly'))))
                     ):
                         l_context[ix] = prev_line[:-2]
                     elif prev_line[-2].isupper() or prev_line[-2].isnumeric():
@@ -323,7 +341,8 @@ def main():
 
             eval_start = []
             for prev_line in l_context:
-                eval_start.append(max(0, diff_start + len(prev_line) - TARGET_CONTEXT))
+                eval_start.append(max(0, diff_start + len(prev_line)
+                                      - TARGET_CONTEXT))
 
             # add next line for additional right context if necessary
             r_missing = TARGET_CONTEXT + LR_CONTEXT - diff_end
@@ -343,7 +362,9 @@ def main():
             # generate alternatives
 
             diff_dict['alt_sets'][-1]['context'] =\
-                ' // '.join([l_context[0], get_diff_string(segs), r_context[0]])
+                ' // '.join([l_context[0],
+                             get_diff_string(segs),
+                             r_context[0]])
 
             for text_variant, sources in zip(path_texts, path_sources):
                 for lc, rc, start in zip(l_context, r_context, eval_start):
@@ -352,13 +373,15 @@ def main():
                             center = text_variant[:-a_removed]
                         else:
                             center = text_variant
-                        end = max(0, diff_end - TARGET_CONTEXT + len(rc) - a_removed)
+                        end = max(0, diff_end - TARGET_CONTEXT + len(rc)
+                                  - a_removed)
                     elif b_removed >= 0 and sources[-1] == 'b':
                         if b_removed:
                             center = text_variant[:-b_removed]
                         else:
                             center = text_variant
-                        end = max(0, diff_end - TARGET_CONTEXT + len(rc) - b_removed)
+                        end = max(0, diff_end - TARGET_CONTEXT + len(rc)
+                                  - b_removed)
                     else:
                         center = text_variant + ' '
                         end = max(0, diff_end - TARGET_CONTEXT + len(rc) + 1)
@@ -368,15 +391,18 @@ def main():
                     # print('LC:', lc)
                     # print('RC:', rc)
                     # print('CC:', concat_text)
-                    eval_span = concat_text[:start] + '##' + concat_text[start:conc_end] + '##' + concat_text[conc_end:]
-#                    print(eval_span)
-#                    print(f"{sources}, {start}, {conc_end}")
+                    # eval_span = (concat_text[:start] + '##'
+                    #              + concat_text[start:conc_end] + '##'
+                    #              + concat_text[conc_end:])
+                    # print(eval_span)
+                    # print(f"{sources}, {start}, {conc_end}")
 
                     diff_dict['alt_sets'][-1]['alternatives'].append(
                         {'text': concat_text, 'sources': sources,
                          'start': start, 'end': conc_end})
 
-    with open(argv[1][:-len('.json')] + '_diffs.json', 'w', encoding='utf-8') as diff_file:
+    diff_fname = argv[1][:-len('.json')] + '_diffs.json'
+    with open(diff_fname, 'w', encoding='utf-8') as diff_file:
         json.dump(diff_dict, diff_file)
 
 if __name__ == '__main__':
