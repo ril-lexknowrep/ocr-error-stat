@@ -9,7 +9,7 @@ from pathlib import Path
 from Levenshtein import distance
 
 MAXDIST = 30
-IDX_MULT = 1000
+IDX_MULT = 10000  # must be set higher than the number of line objects on a page in all pdfs
 HEADER_HEIGHT = 0.1
 FOOTER_HEIGHT = 0.1
 
