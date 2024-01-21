@@ -26,7 +26,9 @@ for diff_fname in diff_files:
     if not diff_fname.endswith('_diffs.json'):
         continue
 
-    if Path(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json').exists():
+    eval_fname = (diff_dir + '/' + diff_fname.removesuffix('.json')
+                  + '_eval.json')
+    if Path(eval_fname).exists():
         continue
 
     with open(diff_dir + '/' + diff_fname) as json_file:
@@ -36,6 +38,8 @@ for diff_fname in diff_files:
     b_label = diff_dict['b_label']
 
     diffs = []
+    a_texts = []
+    b_texts = []
     contexts = []
 
     sequences = []
@@ -48,6 +52,8 @@ for diff_fname in diff_files:
     for alt_set in diff_dict['alt_sets']:
         split_counts.append(len(alt_set['alternatives']))
         diffs.append(alt_set['diffs'])
+        a_texts.append(alt_set['a_text'])
+        b_texts.append(alt_set['b_text'])
         contexts.append(alt_set['context'])
         for alt in alt_set['alternatives']:
             sequences.append(alt['text'])
@@ -78,18 +84,22 @@ for diff_fname in diff_files:
 
     split_preds = split_into(perplexities, split_counts)
     split_sources = split_into(sources, split_counts)
+    split_seqs = split_into(sequences, split_counts)
 
-    outfile = open(diff_dir + '/' + diff_fname[:-len('.json')] + "_eval.tsv",
+    outfile = open(eval_fname.removesuffix(".json") + ".tsv",
                    'w', encoding='utf-8')
     out_dict = {'diff_file': diff_fname, "a_label": a_label,
                 "b_label": b_label, "alt_sets": []}
 
-    for line_context, line_diffs, line_prs, line_srcs in zip(
-                                contexts, diffs, split_preds, split_sources):
+    for (line_context, a_txt, b_txt, line_diffs,
+         line_prs, line_srcs, line_seqs) in zip(
+            contexts, a_texts, b_texts, diffs,
+            split_preds, split_sources, split_seqs):
         best_pred = min(line_prs)
         out_dict['alt_sets'].append({'diffs': line_diffs, 'winners': [],
                                     'min_perplexities': []})
         print('', file=outfile)
+        print(line_context, file=outfile)
         for ix, diff in enumerate(line_diffs):
             a_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'a']
             b_preds = [p for p, s in zip(line_prs, line_srcs) if s[ix] == 'b']
@@ -105,12 +115,18 @@ for diff_fname in diff_files:
 
             print('\t'.join([f"›{diff['a']}‹", f"›{diff['b']}‹",
                              f'›{diff[winner]}‹',
-                             f'{min_a:.4f}', f'{min_b:.4f}', line_context]),
+                             f'{min_a:.4f}', f'{min_b:.4f}']),
                   file=outfile)
         assert len(out_dict['alt_sets'][-1]['diffs']) ==\
             len(out_dict['alt_sets'][-1]['winners'])
+        print("A:", a_txt, file=outfile)
+        print("B:", b_txt, file=outfile)
+        winners = ''.join(out_dict['alt_sets'][-1]['winners'])
+        for alt_text, source in zip(line_seqs, line_srcs):
+            if source == winners:
+                print("->", alt_text, file=outfile)
+            break
     outfile.close()
 
-    with open(diff_dir + '/' + diff_fname[:-len('.json')] + '_eval.json',
-              'w') as out_json:
+    with open(eval_fname, 'w') as out_json:
         json.dump(out_dict, out_json)
