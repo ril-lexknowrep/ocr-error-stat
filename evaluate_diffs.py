@@ -10,7 +10,7 @@ path.append(CLM_PATH)
 import lstm_model
 from encode_characters import InputEncoder, OutputEncoder
 
-MAX_DIFFS_PER_DOC = 30000
+MAX_DIFFS_PER_DOC = 70000
 
 input_enc = InputEncoder(file=CLM_PATH+"input_encoder.json")
 output_enc = OutputEncoder(file=CLM_PATH+"output_encoder.json")
@@ -67,6 +67,7 @@ for diff_fname in diff_files:
     print(len(sequences))
 
     if len(sequences) == 0 or len(sequences) > MAX_DIFFS_PER_DOC:
+        print("Skipping")
         continue
 
     preds = bilstm_model.predict_subsequences(
@@ -125,7 +126,7 @@ for diff_fname in diff_files:
         for alt_text, source in zip(line_seqs, line_srcs):
             if source == winners:
                 print("->", alt_text, file=outfile)
-            break
+                break
     outfile.close()
 
     with open(eval_fname, 'w') as out_json:
